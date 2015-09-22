@@ -7,8 +7,6 @@ Functionalities:
 * To store object easily, encode/decode it with JSON automatically
 * Ability to define namespace and use it as a specific storage
 * Magic getter and setter to have access at an infinite object level with one call
-* Add jquery.cookie and manage your cookies with this API
-* You want use storage on old browsers? Add jquery.cookie & JSON and jQuery Storage API uses cookies to simulate storage!
 
 
 Storages
@@ -19,14 +17,10 @@ Storages
 #### Session storage
     $.sessionStorage
 
-#### Cookie storage (only if jquery.cookie added)
-    $.cookieStorage
-
 #### Namespace storage
     ns=$.initNamespaceStorage('ns_name');
     ns.localStorage // Namespace in localStorage
     ns.sessionStorage // Namespace in sessionStorage
-    ns.cookieStorage // Namespace in cookieStorage (only if jquery.cookie added)
 
 Public methods on storage
 -------------------------
@@ -112,51 +106,6 @@ Truncate the storage
     storage.removeAll() // Delete all items from the storage
     storage.removeAll(true) // Only on global storages. Delete all items from the storage and reinitialize previously initialized namespaces
 
-### `setExpires()`
-Only on cookieStorage. Sets expires date in days (default value is null, cookie is valid for session only; only cookies set after setExpires() call will be affected).
-
-    storage.setExpires(10) // Set expiry date to today + 10 days
-
-This method returns the storage object, so you can:
-
-    storage.setExpires(10).set('foo','value') // Set expiry date to today + 10 days and set a new cookie
-
-### `setPath()`
-Only on cookieStorage. Sets path for cookies (default value is null; only cookies set after setPath() call will be affected).
-
-    storage.setPath('/') // Set path to '/'
-
-This method return the storage object, so you can:
-
-    storage.setPath('/').set('foo','value') // Set path to '/' and set a new cookie
-
-### `setDomain()`
-Only on cookieStorage. Sets domain for cookies (default value is null; only cookies set after setDomain() call will be affected).
-
-    storage.setDomain('www.ndd.com') // Set domain to www.ndd.com
-
-This method return the storage object, so you can:
-
-    storage.setDomain('www.ndd.com').set('foo','value') // Set domain to www.ndd.com and set a new cookie
-
-### `setConf()`
-Only on cookieStorage. Sets cookie configuration with an object (only cookies set after setConf() call will be affected).
-
-    storage.setConf({path:'/',expires:10,'domain':'www.ndd.com'}) // Set expiry date, domain and path
-
-This method return the storage object, so you can:
-
-    storage.setConf({path:'/',expires:10}).set('foo','value') // Set configuration and set a new cookie
-
-### `setDefaultConf()`
-Only on cookieStorage. Sets default configuration (only cookies set after setDefaultConf() call will be affected).
-
-    storage.setDefaultConf() // Set path, domain and expiry date to null
-
-This method return the storage object, so you can:
-
-    storage.setDefaultConf().set('foo','value') // Set default configuration and set a new cookie
-
 ### `$.namespaceStorages`
 Object that contains all initilialized namespace storages.
 
@@ -172,16 +121,5 @@ Compatibility
 
 jQuery Storage API is compatible with all browsers that support storage and JSON natively.
 
-If you want more compatibility:
-* Add jquery.cookie (https://github.com/carhartl/jquery-cookie) before this plugin and storage will work on every browsers that support JSON natively!
 * You want more? Add json2.js (https://github.com/douglascrockford/JSON-js), too, and storage will be enable on every browser!
 
-
-
-Migration
----------
-
-### 1.2.x => 1.3.0
-To resolve an issue on IE8 that doesn't like function named "delete", we had to change name of delete functions.  
-So public methods "delete" and "deleteAll" become "remove" and "removeAll".  
-Sorry for inconvenience...
