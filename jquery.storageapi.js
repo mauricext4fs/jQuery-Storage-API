@@ -2,14 +2,15 @@
  * jQuery Storage API Plugin
  *
  * Copyright (c) 2013 Julien Maurel
+ * Hack by Maurice Courtois @2015 (remove all cookie functionalities)
  *
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
  *
  * Project home:
- * https://github.com/julien-maurel/jQuery-Storage-API
+ * https://github.com/mauricext4fs/jQuery-Storage-API
  *
- * Version: 1.7.3
+ * Version: 1.0.0
  *
  */
 (function (factory) {
@@ -24,9 +25,6 @@
     factory(jQuery);
   }
 }(function($){
-  // Prefix to use with cookie fallback
-  var cookie_local_prefix="ls_";
-  var cookie_session_prefix="ss_";
 
   // Get items from a storage
   function _get(storage){
@@ -242,17 +240,8 @@
     }else{
       o=s;
     }
-    if(o && o._cookie){
-      // If storage is a cookie, use $.cookie to retrieve keys
-      for(var key in $.cookie()){
-        if(key!='') {
-          keys.push(key.replace(o._prefix,''));
-        }
-      }
-    }else{
-      for(var i in o){
-        keys.push(i);
-      }
+    for(var i in o){
+      keys.push(i);
     }
     return keys;
   }
@@ -271,10 +260,6 @@
       localStorage:$.extend({},$.localStorage,{_ns:name}),
       sessionStorage:$.extend({},$.sessionStorage,{_ns:name})
     };
-    if($.cookie){
-      if(!window.cookieStorage.getItem(name)) window.cookieStorage.setItem(name,'{}');
-      ns.cookieStorage=$.extend({},$.cookieStorage,{_ns:name});
-    }
     $.namespaceStorages[name]=ns;
     return ns;
   }
@@ -358,72 +343,6 @@
     }
   };
 
-  // Use jquery.cookie for compatibility with old browsers and give access to cookieStorage
-  if($.cookie){
-    // sessionStorage is valid for one window/tab. To simulate that with cookie, we set a name for the window and use it for the name of the cookie
-    if(!window.name) window.name=Math.floor(Math.random()*100000000);
-    var cookie_storage={
-      _cookie:true,
-      _prefix:'',
-      _expires:null,
-      _path:null,
-      _domain:null,
-      setItem:function(n,v){
-        $.cookie(this._prefix+n,v,{expires:this._expires,path:this._path,domain:this._domain});
-      },
-      getItem:function(n){
-        return $.cookie(this._prefix+n);
-      },
-      removeItem:function(n){
-        return $.removeCookie(this._prefix+n);
-      },
-      clear:function(){
-        for(var key in $.cookie()){
-          if(key!=''){
-            if(!this._prefix && key.indexOf(cookie_local_prefix)===-1 && key.indexOf(cookie_session_prefix)===-1 || this._prefix && key.indexOf(this._prefix)===0) {
-              $.removeCookie(key);
-            }
-          }
-        }
-      },
-      setExpires:function(e){
-        this._expires=e;
-        return this;
-      },
-      setPath:function(p){
-        this._path=p;
-        return this;
-      },
-      setDomain:function(d){
-        this._domain=d;
-        return this;
-      },
-      setConf:function(c){
-        if(c.path) this._path=c.path;
-        if(c.domain) this._domain=c.domain;
-        if(c.expires) this._expires=c.expires;
-        return this;
-      },
-      setDefaultConf:function(){
-        this._path=this._domain=this._expires=null;
-      }
-    };
-    if(!storage_available){
-      window.localCookieStorage=$.extend({},cookie_storage,{_prefix:cookie_local_prefix,_expires:365*10});
-      window.sessionCookieStorage=$.extend({},cookie_storage,{_prefix:cookie_session_prefix+window.name+'_'});
-    }
-    window.cookieStorage=$.extend({},cookie_storage);
-    // cookieStorage API
-    $.cookieStorage=$.extend({},storage,{
-      _type:'cookieStorage',
-      setExpires:function(e){window.cookieStorage.setExpires(e); return this;},
-      setPath:function(p){window.cookieStorage.setPath(p); return this;},
-      setDomain:function(d){window.cookieStorage.setDomain(d); return this;},
-      setConf:function(c){window.cookieStorage.setConf(c); return this;},
-      setDefaultConf:function(){window.cookieStorage.setDefaultConf(); return this;}
-    });
-  }
-
   // Get a new API on a namespace
   $.initNamespaceStorage=function(ns){ return _createNamespace(ns); };
   if(storage_available) {
@@ -443,7 +362,6 @@
   $.removeAllStorages=function(reinit_ns){
     $.localStorage.removeAll(reinit_ns);
     $.sessionStorage.removeAll(reinit_ns);
-    if($.cookieStorage) $.cookieStorage.removeAll(reinit_ns);
     if(!reinit_ns){
       $.namespaceStorages={};
     }
